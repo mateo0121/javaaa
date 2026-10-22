@@ -1,53 +1,96 @@
-package hr.obskc_toplak.concerts;
+package mz.proizvod;
 
-public class Concerts {
- 
-    public static void main(String[] args) {
-        Concert first = new Concert ("Prljavo kazalište", 25.00, 120);
-        Concert second = new Concert ("Gibonni", 32.50, 80);
-       
-        System.out.println(first.description());
-        System.out.println(second.description());
-       
-        Concert third = new Concert("Hladno pivo", 20);
-        System.out.println(third.description());
-       
-        first.reserve(20);
-        third.cancel(5);
-        second.setTicketPrice(30);
-        System.out.println(first.getArtist() + ": slobodno još " + first.getFreeSeats() + " mjesta");
-       
-        try {
-            second.reserve(1000);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Odbijeno: " + e.getMessage());
+
+public class Proizvod {
+    
+    private static int proizvodCount = 0;
+    
+    private final String sifra;
+    private String naziv;
+    private double cijena;
+    private int kolicina;
+   
+    public Proizvod(String naziv, double cijena, int kolicina) {
+        setNaziv(naziv);
+        setCijena(cijena);
+        checkKolicina(kolicina);
+        this.kolicina = kolicina;
+        
+        proizvodCount++;
+        this.sifra = "P" + String.format("%03d", proizvodCount);
+    }
+   
+    public Proizvod(String naziv, double cijena) {
+        this(naziv, cijena, 0);
+    }
+   
+    public String getSifra() {
+        return sifra;
+    }
+
+    public String getNaziv() {
+        return naziv;
+    }
+
+    public double getCijena() {
+        return cijena;
+    }
+
+    public int getKolicina() {
+        return kolicina;
+    }
+
+    public static int getProizvodCount() {
+        return proizvodCount;
+    }
+
+    public void setNaziv(String naziv) {
+        if (naziv == null || naziv.isBlank()) {
+            throw new IllegalArgumentException("Naziv ne smije biti prazan.");
         }
-       
-        try {
-            new Concert("    ", 10);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Odbijeno: " + e.getMessage());
+        this.naziv = naziv.strip();
+    }
+
+    public void setCijena(double cijena) {
+        if (cijena < 0) {
+            throw new IllegalArgumentException("Cijena ne smije biti negativna.");
         }
-       
-        try {
-            third.setTicketPrice(-3);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Odbijeno: " + e.getMessage());
+        this.cijena = cijena;
+    }
+   
+    private void checkKolicina(int kolicina) {
+        if (kolicina < 0) {
+            throw new IllegalArgumentException("Količina ne smije biti negativna.");
         }
-         
-        System.out.printf("Preostala zarada za (%s): %.2f EUR%n", second.getArtist(), second.remainigRevenue());
-        System.out.printf("Preostala zarada uz 20 %% popusta (%s): %.2f EUR%n", second.getArtist(), second.remainigRevenue(20));
-       
-        System.out.println("Broj koncerata: " + Concert.getConcertCount());
-        System.out.println("Zadani kapacitet: " + Concert.DEFAULT_CAPACITY);
-        System.out.println("Je li K042 ispravna šifra? " + Concert.isValidCode("K042"));
-        System.out.println("Je li X042 ispravna šifra? " + Concert.isValidCode("X042"));
-       
-        Concert[] program = {first, second, third};
-        int totalFreeSeats = 0;
-        for (Concert c : program) {
-            totalFreeSeats += c.getFreeSeats();
+    }
+   
+    public void dodaj(int kolicinaZaDodati) {
+        if (kolicinaZaDodati <= 0) {
+            throw new IllegalArgumentException("Količina za dodavanje mora biti pozitivna.");
         }
-        System.out.println("Ukupno slobodnih mjesta: " + totalFreeSeats);
+        this.kolicina += kolicinaZaDodati;
+    }
+   
+    public void prodaj(int kolicinaZaProdati) {
+        if (kolicinaZaProdati <= 0) {
+            throw new IllegalArgumentException("Količina za prodaju mora biti pozitivna.");
+        }
+        if (kolicinaZaProdati > this.kolicina) {
+            throw new IllegalArgumentException("Količina ne smije pasti ispod nule.");
+        }
+        this.kolicina -= kolicinaZaProdati;
+    }
+   
+    public double ukupnaVrijednost() {
+        return this.kolicina * this.cijena;
+    }
+   
+    public double ukupnaVrijednost(double popust) {
+        double osnovnaVrijednost = ukupnaVrijednost();
+        return osnovnaVrijednost * (1 - popust / 100.0);
+    }
+   
+    public String opis() {
+        return String.format("%s | %s | %.2f EUR | %d kom.", sifra, naziv, cijena, kolicina);
     }
 }
