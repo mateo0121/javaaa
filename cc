@@ -1,4 +1,4 @@
-package mz.concerts;
+package hr.obskc_toplak.concerts;
 
 public class Concert {
     
@@ -114,9 +114,5 @@ public class Concert {
         } catch (NumberFormatException e) {
             return false;
         }
-    }
-
-    String isArtist(String typed) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
