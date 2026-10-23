@@ -1,4 +1,4 @@
-package mz.concerts;
+package hr.obskc_toplak.concerts;
 
 public class Concerts {
  
@@ -49,41 +49,5 @@ public class Concerts {
             totalFreeSeats += c.getFreeSeats();
         }
         System.out.println("Ukupno slobodnih mjesta: " + totalFreeSeats);
-        
-        Concert same = first;
-        same.reserve(10);
-        System.out.println("Preko varijable first "+ first.getFreeSeats() +" mjesra");
-        
-        int seats = 30;
-        doubleit (seats);
-        System.out.println("Varijabla seats nakon 'dupliranja': " + seats);
-        
-        replace(third);
-        System.out.println("Izvođač nakon zamjene"+ third.getArtist());
-        
-        String typed = new String ("gibonni");
-        System.out.println(""+ (typed == "gibonni"));
-          System.out.println(""+ typed.equals("gibonni"));
-          System.out.println(""+ second.isArtist(typed));
-          
-          String name = "Gibonni";
-          String newName = name.toUpperCase();
-          System.out.println("Provjer imane"+ newName);
-          
-          StringBuilder poster = new StringBuilder("Program");
-          for (Concert c : Program){
-            poster.append(c.getArtist()) append("");
-                    }
-          System.out.println(poster);
     }
-    
-    static void doubleit (int x){
-        x = x*2;
-    }
-    
-    static void raisePriceConcert (Concert c){
-        c.setTicketPrice(c.getTicketPrice()+3);
-    }
-    static void replace(Concert c){
-        c = new Concert ("Netko drugi",1.00);
-    }
+}
