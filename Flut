@@ -1,0 +1,246 @@
+import "package:flutter/material.dart";
+
+class SeriesItem {
+  final String name;
+  final String genre;
+  final String description;
+  final IconData icon;
+
+  const SeriesItem({
+    required this.name,
+    required this.genre,
+    required this.description,
+    required this.icon,
+  });
+}
+
+const List<SeriesItem> seriesList = [
+  SeriesItem(
+    name: "Stranger Things",
+    genre: "Sci-Fi / Horor • 4 sezone",
+    description: "Grupa djece otkriva nadnaravne misterije i tajne eksperimente u svom gradiću.",
+    icon: Icons.tv,
+  ),
+  SeriesItem(
+    name: "Breaking Bad",
+    genre: "Kriminalistička drama • 5 sezona",
+    description: "Profesor kemije počinje proizvoditi ilegalne supstance kako bi osigurao obitelj.",
+    icon: Icons.local_fire_department,
+  ),
+  SeriesItem(
+    name: "The Witcher",
+    genre: "Fantastika • 3 sezone",
+    description: "Mutirani lovac na čudovišta putuje kontinentom u potrazi za svojim mjestom u svijetu.",
+    icon: Icons.flash_on,
+  ),
+  SeriesItem(
+    name: "Friends",
+    genre: "Komedija • 10 sezona",
+    description: "Zabavne zgode i nezgode šestero prijatelja koji žive u New Yorku.",
+    icon: Icons.tag_faces,
+  ),
+  SeriesItem(
+    name: "The Office",
+    genre: "Komedija • 9 sezona",
+    description: "Mockumentary prikaz svakodnevnog, urnebesnog života zaposlenika u uredu.",
+    icon: Icons.business_center,
+  ),
+];
+
+import 'package:flutter/material.dart';
+import '../models/series.dart';
+
+class SeriesDetailScreen extends StatelessWidget {
+  final SeriesItem series;
+  final bool isWatched;
+
+  const SeriesDetailScreen({
+    super.key,
+    required this.series,
+    required this.isWatched,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(series.name)),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              margin: const EdgeInsets.only(bottom: 16),
+              decoration: BoxDecoration(
+                color: Colors.purple.shade50,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.purple),
+              ),
+              child: Row(
+                children: [
+                  Icon(series.icon, size: 48, color: Colors.purple),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(series.genre, style: const TextStyle(fontWeight: FontWeight.bold))),
+                ],
+              ),
+            ),
+            Text(
+              series.description,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: isWatched
+                      ? null
+                      : () {
+                          Navigator.pop(context, true);
+                        },
+                  child: Text(isWatched ? "Pogledano" : "Označi kao pogledano"),
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Natrag"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+import 'package:flutter/material.dart';
+
+import '../models/series.dart';
+import 'series_detail_screen.dart';
+
+class SeriesListScreen extends StatefulWidget {
+  const SeriesListScreen({super.key});
+
+  @override
+  State<SeriesListScreen> createState() => _SeriesListScreenState();
+}
+
+class _SeriesListScreenState extends State<SeriesListScreen> {
+  final Set<String> watched = {};
+
+  Future<void> openDetails(SeriesItem series) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SeriesDetailScreen(
+          series: series,
+          isWatched: watched.contains(series.name),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        watched.add(series.name);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> tiles = [];
+    for (final series in seriesList) {
+      tiles.add(
+        SeriesTile(
+          series: series,
+          isWatched: watched.contains(series.name),
+          onOpen: () {
+            openDetails(series);
+          },
+        ),
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(title: const Text("Moje serije")),
+      body: ListView(padding: const EdgeInsets.all(8), children: tiles),
+    );
+  }
+}
+
+class SeriesTile extends StatelessWidget {
+  final SeriesItem series;
+  final bool isWatched;
+  final VoidCallback onOpen;
+
+  const SeriesTile({
+    super.key,
+    required this.series,
+    required this.isWatched,
+    required this.onOpen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            series.icon,
+            size: 32,
+            color: isWatched ? Colors.purple : Colors.grey,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  series.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(series.genre),
+              ],
+            ),
+          ),
+          IconButton(onPressed: onOpen, icon: const Icon(Icons.chevron_right)),
+        ],
+      ),
+    );
+  }
+}
+
+
+import 'package:flutter/material.dart';
+import 'screens/series_list_screen.dart';
+
+void main() {
+  runApp(const SeriesApp());
+}
+
+class SeriesApp extends StatelessWidget {
+  const SeriesApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Praćenje serija",
+      theme: ThemeData(primarySwatch: Colors.purple),
+      home: const SeriesListScreen(),
+    );
+  }
+}
